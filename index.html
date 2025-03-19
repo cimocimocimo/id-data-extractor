@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body>
+    <h2>Hello OpenCV.js</h2>
+    <p id="status"></p>
+    <div>
+      <table cellpadding="0" cellspacing="0" width="0" border="0">
+        <tbody>
+          <tr>
+            <td>
+              <img id="imageSrc" alt="No Image" class="small" src="" />
+            </td>
+            <td>
+              <canvas id="canvasOutput" class="small" height="300px"></canvas>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="caption">
+                imageSrc
+                <input
+                  type="file"
+                  id="fileInput"
+                  name="file"
+                  accept="image/*"
+                />
+              </div>
+            </td>
+            <td>
+              <div class="caption">canvasOutput</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script type="text/javascript">
+            var imgElement = document.getElementById("imageSrc");
+            var inputElement = document.getElementById("fileInput");
+            inputElement.addEventListener(
+              "change",
+              (e) => {
+                imgElement.src = URL.createObjectURL(e.target.files[0]);
+              },
+              false
+            );
+
+            imgElement.onload = function () {
+              cv.then();
+              var mat = cv.imread(imgElement);
+              cv.imshow("canvasOutput", mat);
+              mat.delete();
+            };
+
+            function onOpenCvReady() {
+              // eslint-disable-line no-unused-vars
+              document.getElementById("status").innerHTML =
+                "<b>OpenCV.js is ready</b>." +
+                "You can upload an image.<br>" +
+                "The <b>imageSrc</b> is a &lt;img&gt; element used as cv.Mat input. " +
+                "The <b>canvasOutput</b> is a &lt;canvas&gt; element used as cv.Mat output.";
+                cv = await cv;
+              // cv.then((aa) => {
+      //   console.log(aa);
+      //   console.log(aa.getBuildInformation());
+      // });
+            }
+
+            function onOpenCvError() {
+              // eslint-disable-line no-unused-vars
+              var element = document.getElementById("status");
+              element.setAttribute("class", "err");
+              element.innerHTML = "Failed to load opencv.js";
+            }
+    </script>
+    <script
+      async
+      src="opencv.js"
+      type="text/javascript"
+      onload="onOpenCvReady();"
+      onerror="onOpenCvError();"
+    ></script>
+  </body>
+  <style class="stylus">
+    /* Insert code here... */
+    #doc-content > div > div.contents {
+      max-width: 960px;
+      width: auto;
+    }
+  </style>
+</html>
