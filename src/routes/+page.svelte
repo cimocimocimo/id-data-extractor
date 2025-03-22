@@ -11,19 +11,23 @@
 	let loadingVideo = false;
 
 	const toggleVideoStream = async () => {
-		try {
-			loadingVideo = true;
-			const stream = await navigator.mediaDevices.getUserMedia({
-				video: {
-					width: { ideal: 4096 },
-					height: { ideal: 2160 }
-				}
-			});
-			videoSource.srcObject = stream;
-			videoSource.play();
-			loadingVideo = false;
-		} catch (error) {
-			console.log(error);
+		if (paused) {
+			try {
+				loadingVideo = true;
+				const stream = await navigator.mediaDevices.getUserMedia({
+					video: {
+						width: { ideal: 4096 },
+						height: { ideal: 2160 }
+					}
+				});
+				videoSource.srcObject = stream;
+				videoSource.play();
+				loadingVideo = false;
+			} catch (error) {
+				console.log(error);
+			}
+		} else {
+			videoSource.pause();
 		}
 	};
 </script>
