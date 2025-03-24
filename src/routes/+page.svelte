@@ -1,47 +1,35 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button/index.js';
-  import * as Card from '$lib/components/ui/card/index.js';
-  import { Input } from '$lib/components/ui/input/index.js';
-  import { Label } from '$lib/components/ui/label/index.js';
-  import { fn } from '@storybook/test';
+  import cv from '$lib/opencv';
+  Module = {
+    onRuntimeInitialized() {
+      // this is our application:
+      console.log(cv.getBuildInformation());
+    },
+  };
+  let video: HTMLVideoElement;
+  let canvas: HTMLCanvasElement;
 
-  let isProcessingVideo = $state(false);
-  let paused = $state(true);
-  let videoSource = null;
-  let loadingVideo = $state(false);
-
-  async function getCameraStream() {
-    return await navigator.mediaDevices.getUserMedia({
+  function initVideoProcessing() {
+    let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+    let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+    let cap = new cv.VideoCapture(video);
+  }
+  async function initCameraStream() {
+    const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         width: { ideal: 4096 },
         height: { ideal: 2160 },
       },
     });
+    video.srcObject = stream;
+    video.play();
   }
-
-  const toggleVideoStream = async () => {
-    try {
-      loadingVideo = true;
-      videoSource.srcObject = await getCameraStream();
-      videoSource.play();
-      loadingVideo = false;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  initCameraStream();
 </script>
 
 <div class="flex h-screen items-center justify-center">
-  <div>
-    <Button class="" onclick={toggleVideoStream}
-      >{isProcessingVideo ? 'Stop' : 'Start'} Video</Button
-    >
-  </div>
-  {#if loadingVideo}
-    <h1>LOADING</h1>
-  {/if}
-  <video bind:this={videoSource} bind:paused>
+  <video bind:this={video}>
     <track kind="captions" />
   </video>
-  <canvas id="canvasOutput"></canvas>
+  <canvas bind:this={canvas}></canvas>
 </div>
