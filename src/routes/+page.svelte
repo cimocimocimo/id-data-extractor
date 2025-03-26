@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { getCameraStream } from '$lib/camera';
+  import { Button } from '$lib/components/ui/button';
+
   let video: HTMLVideoElement;
   let canvas: HTMLCanvasElement;
   let streaming = false;
@@ -61,8 +64,8 @@
   }
 
   function initVideoProcessing() {
-    let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-    let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+    let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+    let dst = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
     let cap = new cv.VideoCapture(video);
     const FPS = 30;
     function processVideo() {
@@ -89,24 +92,27 @@
     // schedule the first one.
     setTimeout(processVideo, 0);
   }
+
   async function initCameraStream() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 4096 },
-        height: { ideal: 2160 },
-      },
-    });
+    const stream = await getCameraStream();
     video.srcObject = stream;
     video.play();
+    console.log(video.height);
     streaming = true;
-    initVideoProcessing();
+
+    // initVideoProcessing(video);
   }
+
   initCameraStream();
+  // let stream = getCameraStream();
+  //  video.srcObject = stream;
+  //  video.play();
 </script>
 
 <div class="flex h-screen items-center justify-center">
-  <video bind:this={video}>
+  <video bind:this={video} height="540" width="1024">
     <track kind="captions" />
   </video>
-  <canvas bind:this={canvas}></canvas>
+  <Button on:click={initVideoProcessing}>click me</Button>
+  <canvas bind:this={canvas} height="540" width="1024"></canvas>
 </div>
