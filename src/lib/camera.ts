@@ -17,11 +17,18 @@ export async function loadOpenCv() {
   node.parentNode.insertBefore(script, node);
 }
 
-export async function getCameraStream() {
-  return await navigator.mediaDevices.getUserMedia({
-    video: {
-      width: { exact: 1024 },
-      height: { exact: 540 },
-    },
-  });
+export async function getCameraV2() {
+  return ((stream) => {
+    return {
+      stream: stream,
+      settings: stream.getVideoTracks()[0].getSettings(),
+    };
+  })(
+    await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { exact: 1024 },
+        height: { exact: 540 },
+      },
+    }),
+  );
 }
