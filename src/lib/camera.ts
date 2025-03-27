@@ -84,7 +84,6 @@ function detectObjects(frame) {
         // Calculate aspect ratio (example)
         let rect = cv.boundingRect(contour);
         let aspectRatio = rect.width / rect.height;
-        console.log(aspectRatio);
         if (aspectRatio > minAspectRatio && aspectRatio < maxAspectRatio) {
           // ... Perspective Transform
           //
@@ -106,9 +105,13 @@ function detectObjects(frame) {
   return edges;
 }
 
-export function initVideoProcessing(video: HTMLMediaElement, canvas: HTMLCanvasElement) {
-  let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-  let dst = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
+export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
+  console.log({
+    h: video.height,
+    w: video.width,
+  });
+  let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+  let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
   let cap = new cv.VideoCapture(video);
   const FPS = 30;
   function processVideo() {
