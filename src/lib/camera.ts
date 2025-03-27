@@ -30,8 +30,10 @@ export async function getCameraV2() {
 export async function getCameraStream(): Promise<MediaStream> {
   return await navigator.mediaDevices.getUserMedia({
     video: {
-      width: { ideal: 4096 },
-      height: { ideal: 2160 },
+      width: { exact: 1024 },
+      height: { exact: 540 },
+      // width: { ideal: 4096 },
+      // height: { ideal: 2160 },
     },
   });
 }
