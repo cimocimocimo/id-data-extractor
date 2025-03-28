@@ -1,6 +1,7 @@
 declare var cv: {};
 
 const OPENCV_URL = 'opencv.js';
+const FPS = 30;
 
 export async function loadOpenCv() {
   let script = document.createElement('script');
@@ -11,29 +12,11 @@ export async function loadOpenCv() {
   document.head.appendChild(script);
 }
 
-export async function getCameraV2() {
-  return ((stream) => {
-    return {
-      stream: stream,
-      settings: stream.getVideoTracks()[0].getSettings(),
-    };
-  })(
-    await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { exact: 1024 },
-        height: { exact: 540 },
-      },
-    }),
-  );
-}
-
 export async function getCameraStream(): Promise<MediaStream> {
   return await navigator.mediaDevices.getUserMedia({
     video: {
-      width: { exact: 1024 },
-      height: { exact: 540 },
-      // width: { ideal: 4096 },
-      // height: { ideal: 2160 },
+      width: { ideal: 1024 },
+      height: { ideal: 540 },
     },
   });
 }
@@ -51,11 +34,11 @@ export async function initVideoElement(
   return true;
 }
 
-function detectObjects(frame) {
-  const minArea = 1;
-  const maxArea = 9999;
-  const minAspectRatio = 0;
-  const maxAspectRatio = 0;
+function detectObjects(frame, canvas) {
+  const minArea = 5000;
+  const maxArea = 500000;
+  const minAspectRatio = 1.2;
+  const maxAspectRatio = 1.8;
 
   let gray = new cv.Mat();
   let blurred = new cv.Mat();
@@ -82,11 +65,21 @@ function detectObjects(frame) {
       // Quadrilateral
       let area = cv.contourArea(contour);
       if (area > minArea && area < maxArea) {
+        console.log('area is about right');
+        console.log(area);
         // Area threshold
         // Calculate aspect ratio (example)
         let rect = cv.boundingRect(contour);
         let aspectRatio = rect.width / rect.height;
+        console.log('aspectRatio: ' + aspectRatio);
         if (aspectRatio > minAspectRatio && aspectRatio < maxAspectRatio) {
+          console.log('aspect ratio is correct');
+          console.log(rect);
+          // Draw the rectangle
+          let point1 = new cv.Point(rect.x, rect.y);
+          let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+          cv.rectangle(frame, point1, point2, new cv.Scalar(0, 255, 0), 2);
+
           // ... Perspective Transform
           //
           // make checks to ensure we have an ID here.
@@ -99,23 +92,20 @@ function detectObjects(frame) {
     contour.delete();
   }
 
+  cv.imshow(canvas, frame);
+
   gray.delete();
   blurred.delete();
   contours.delete();
   hierarchy.delete();
-
-  return edges;
+  edges.delete();
 }
 
 export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-  console.log({
-    h: video.height,
-    w: video.width,
-  });
   let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
   let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
   let cap = new cv.VideoCapture(video);
-  const FPS = 30;
+
   function processVideo() {
     try {
       let begin = Date.now();
@@ -123,7 +113,8 @@ export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasE
       // start processing.
       cap.read(src);
       cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
-      cv.imshow(canvas, detectObjects(src));
+
+      detectObjects(src, canvas);
 
       // schedule the next one.
       let delay = 1000 / FPS - (Date.now() - begin);

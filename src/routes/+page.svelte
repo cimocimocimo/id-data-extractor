@@ -14,21 +14,24 @@
 
     initVideoProcessing(videoNode, canvasNode);
   };
-  console.log(data.camera.settings);
 </script>
 
-<div use:parentAction>
-  <div>
-    <video
-      bind:this={videoNode}
-      id="video-raw"
-      height={data.camera.settings.height}
-      width={data.camera.settings.width}
-    >
-      <track kind="captions" />
-    </video>
+{#if data.camera}
+  <div use:parentAction>
+    <div>
+      <video
+        bind:this={videoNode}
+        height={data.camera.settings.height}
+        width={data.camera.settings.width}
+        class="hidden"
+      >
+        <track kind="captions" />
+      </video>
+    </div>
+    <div>
+      <canvas bind:this={canvasNode} class="w-full"></canvas>
+    </div>
   </div>
-  <div>
-    <canvas bind:this={canvasNode} id="video-processed" style="width: 100%; height: auto;"></canvas>
-  </div>
-</div>
+{:else}
+  <div><span>Camera not found</span></div>
+{/if}
