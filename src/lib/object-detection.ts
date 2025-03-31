@@ -1,5 +1,3 @@
-declare var cv: {};
-
 const OPENCV_URL = 'opencv.js';
 const FPS = 30;
 

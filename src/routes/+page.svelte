@@ -16,20 +16,21 @@
   };
 </script>
 
-{#if data.camera}
+{#if data?.camera}
   <div use:parentAction>
     <div>
       <video
         bind:this={videoNode}
         height={data.camera.settings.height}
         width={data.camera.settings.width}
+        aria-label="video"
         class="hidden"
       >
         <track kind="captions" />
       </video>
     </div>
     <div>
-      <canvas bind:this={canvasNode} class="w-full"></canvas>
+      <canvas bind:this={canvasNode} class="w-full" aria-label="canvas"></canvas>
     </div>
   </div>
 {:else}
