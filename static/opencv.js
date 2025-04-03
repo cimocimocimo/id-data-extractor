@@ -41,7 +41,7 @@ else if (typeof define === 'function' && define['amd'])
   define([], () => cv);
 
   if (typeof Module === 'undefined')
-    Module = {};
+    var Module = {};
   return cv(Module);
 }));
         

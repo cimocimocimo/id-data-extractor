@@ -78,8 +78,8 @@ function detectObjects(frame, canvas) {
 }
 
 export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-  let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-  let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+  let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+  let dst = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
   let cap = new cv.VideoCapture(video);
 
   function processVideo() {
