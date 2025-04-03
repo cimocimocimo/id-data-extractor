@@ -11,10 +11,12 @@ export async function loadOpenCv() {
 }
 
 function detectObjects(frame, canvas) {
-  const minArea = 5000;
-  const maxArea = 500000;
-  const minAspectRatio = 1.2;
-  const maxAspectRatio = 1.8;
+  // const minArea = 5000;
+  // const maxArea = 5000000;
+  const minArea = 1;
+  const maxArea = 100000000;
+  const minAspectRatio = 0.5;
+  const maxAspectRatio = 2;
 
   let gray = new cv.Mat();
   let blurred = new cv.Mat();
@@ -68,18 +70,18 @@ function detectObjects(frame, canvas) {
     contour.delete();
   }
 
-  cv.imshow(canvas, frame);
-
   gray.delete();
   blurred.delete();
   contours.delete();
   hierarchy.delete();
   edges.delete();
+
+  return frame;
 }
 
 export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-  let src = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-  let dst = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
+  let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+  let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
   let cap = new cv.VideoCapture(video);
 
   function processVideo() {
@@ -90,20 +92,20 @@ export function initVideoProcessing(video: HTMLVideoElement, canvas: HTMLCanvasE
       cap.read(src);
       cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
 
-      detectObjects(src, canvas);
+      src = detectObjects(src, canvas);
 
-      // schedule the next one.
-      let delay = 1000 / FPS - (Date.now() - begin);
-      setTimeout(processVideo, delay);
+      cv.imshow(canvas, src);
     } catch (err) {
       console.log(err);
       // clean and stop.
       src.delete();
       dst.delete();
+      clearInterval(intervalId);
       return;
     }
   }
 
   // schedule the first one.
-  setTimeout(processVideo, 0);
+  const intervalId = setTimeout(processVideo, 1000 / FPS);
+  return intervalId;
 }
